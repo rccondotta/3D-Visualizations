@@ -10,6 +10,11 @@ A repository to hold smaller Three.js and React Three Fiber projects
 - Recreating Atmos 3D
 - React Spring
 - Creating a Game (Kana)
+- Portfolio
+- Dissolve Effect
+- Explode Effect
+- Image Transition
+- Mesh Portal Material
 
 ### Resources
 
