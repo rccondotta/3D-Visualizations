@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import {
   Environment,
@@ -24,6 +24,7 @@ import { Balloon } from "./Balloon";
 import { Mailbox } from "./Mailbox";
 import { ParkBench } from "./ParkBench";
 import { Pigeon } from "./Pigeon";
+import { MonitorScreen } from "./MonitorScreen";
 
 import { Avatar } from "./Avatar";
 import { SectionTitle } from "./SectionTitle";
@@ -44,6 +45,24 @@ export const Experience = () => {
       config.sections[Math.round(scrollData.offset * (scrollData.pages - 1))]
     );
   });
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const sectionIndex = config.sections.indexOf(
+        window.location.hash.replace("#", "")
+      );
+      if (sectionIndex !== -1) {
+        scrollData.el.scrollTo(
+          0,
+          (sectionIndex / (config.sections.length - 1)) *
+            (scrollData.el.scrollHeight - scrollData.el.clientHeight)
+        );
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   return (
     <>
@@ -177,6 +196,11 @@ export const Experience = () => {
                 position-y={1}
                 rotation-y={-Math.PI / 2}
                 position-z={-1}
+              />
+              <MonitorScreen
+                rotation-x={-0.18}
+                position-z={-0.895}
+                position-y={1.74}
               />
               <RoundedBox scale-x={2} position-y={0.5} position-z={-1}>
                 <meshStandardMaterial color="white" />
