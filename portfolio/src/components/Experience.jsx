@@ -1,51 +1,58 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
-  Environment,
-  useScroll,
   Center,
+  ContactShadows,
+  Environment,
   Float,
   MeshDistortMaterial,
   RoundedBox,
-  ContactShadows,
+  useScroll,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
 import { motion } from "framer-motion-3d";
+import * as THREE from "three";
 
-import { MacBookPro } from "./MacBookPro";
-import { PalmTree } from "./PalmTree";
-import { Star } from "./Star";
+import { config } from "../config";
+import { useMobile } from "../hooks/useMobile";
+import { Avatar } from "./Avatar";
+import { Balloon } from "./Balloon";
 import { BookCase } from "./BookCase";
 import { CouchSmall } from "./CouchSmall";
 import { Lamp } from "./Lamp";
-import { Monitor } from "./Monitor";
-import { Balloon } from "./Balloon";
+import { MacBookPro } from "./MacBookPro";
 import { Mailbox } from "./Mailbox";
+import { Monitor } from "./Monitor";
+import { MonitorScreen } from "./MonitorScreen";
+import { PalmTree } from "./PalmTree";
 import { ParkBench } from "./ParkBench";
 import { Pigeon } from "./Pigeon";
-import { MonitorScreen } from "./MonitorScreen";
-
-import { Avatar } from "./Avatar";
 import { SectionTitle } from "./SectionTitle";
-import { config } from "../config";
+import { Star } from "./Star";
 
 const SECTIONS_DISTANCE = 10;
 
 export const Experience = () => {
+  const { isMobile, scaleFactor } = useMobile();
   const [section, setSection] = useState(config.sections[0]);
   const sceneContainer = useRef();
   const scrollData = useScroll();
 
   useFrame(() => {
-    sceneContainer.current.position.z =
-      -scrollData.offset * SECTIONS_DISTANCE * (scrollData.pages - 1);
+    if (isMobile) {
+      sceneContainer.current.position.x =
+        -scrollData.offset * SECTIONS_DISTANCE * (scrollData.pages - 1);
+      sceneContainer.current.position.z = 0;
+    } else {
+      sceneContainer.current.position.z =
+        -scrollData.offset * SECTIONS_DISTANCE * (scrollData.pages - 1);
+      sceneContainer.current.position.x = 0;
+    }
 
     setSection(
       config.sections[Math.round(scrollData.offset * (scrollData.pages - 1))]
     );
   });
-
   useEffect(() => {
     const handleHashChange = () => {
       const sectionIndex = config.sections.indexOf(
@@ -67,7 +74,7 @@ export const Experience = () => {
   return (
     <>
       <Environment preset="sunset" />
-      <Avatar />
+      <Avatar position-z={isMobile ? -5 : 0} />
 
       {/* SHADOWS & FLOOR */}
       <ContactShadows opacity={0.5} scale={[30, 30]} color="#9c8e66" />
@@ -86,12 +93,12 @@ export const Experience = () => {
             },
           }}
         >
-          <Star position-z={0} position-y={2.2} scale={0.3} />
+          <Star position-z={isMobile ? -5 : 0} position-y={2.2} scale={0.3} />
           <Float floatIntensity={2} speed={2}>
             <MacBookPro
-              position-x={-1}
-              position-y={0.5}
-              position-z={0}
+              position-x={isMobile ? -0.5 : -1}
+              position-y={isMobile ? 1 : 0.5}
+              position-z={isMobile ? -2 : 0}
               scale={0.3}
               rotation-y={Math.PI / 4}
             />
@@ -99,37 +106,40 @@ export const Experience = () => {
           <PalmTree
             scale={0.018}
             rotation-y={THREE.MathUtils.degToRad(140)}
-            position={[4, 0, -5]}
+            position={isMobile ? [1, 0, -4] : [scaleFactor * 4, 0, -5]}
           />
-          <Float floatIntensity={0.6}>
+          <group scale={isMobile ? 0.3 : 1}>
+            <Float floatIntensity={0.6}>
+              <Center disableY disableZ>
+                <SectionTitle
+                  size={0.8}
+                  position-y={1.6}
+                  position-z={-3}
+                  bevelEnabled
+                  bevelThickness={0.3}
+                >
+                  {config.home.title}
+                </SectionTitle>
+              </Center>
+            </Float>
             <Center disableY disableZ>
               <SectionTitle
-                size={0.8}
-                position-y={1.6}
+                size={1.2}
+                position-x={-2.6}
                 position-z={-3}
                 bevelEnabled
                 bevelThickness={0.3}
+                rotation-y={Math.PI / 10}
               >
-                {config.home.title}
+                {config.home.subtitle}
               </SectionTitle>
             </Center>
-          </Float>
-          <Center disableY disableZ>
-            <SectionTitle
-              size={1.2}
-              position-x={-2.6}
-              position-z={-3}
-              bevelEnabled
-              bevelThickness={0.3}
-              rotation-y={Math.PI / 10}
-            >
-              {config.home.subtitle}
-            </SectionTitle>
-          </Center>
+          </group>
         </motion.group>
         {/* SKILLS */}
         <motion.group
-          position-z={SECTIONS_DISTANCE}
+          position-x={isMobile ? SECTIONS_DISTANCE : 0}
+          position-z={isMobile ? -4 : SECTIONS_DISTANCE}
           position-y={-5}
           variants={{
             skills: {
@@ -137,7 +147,7 @@ export const Experience = () => {
             },
           }}
         >
-          <group position-x={-2}>
+          <group position-x={isMobile ? 0 : -2}>
             <SectionTitle position-z={1.5} rotation-y={Math.PI / 6}>
               SKILLS
             </SectionTitle>
@@ -168,7 +178,8 @@ export const Experience = () => {
         </motion.group>
         {/* PROJECTS */}
         <motion.group
-          position-z={2 * SECTIONS_DISTANCE}
+          position-x={isMobile ? 2 * SECTIONS_DISTANCE : 0}
+          position-z={isMobile ? -3 : 2 * SECTIONS_DISTANCE}
           position-y={-5}
           variants={{
             projects: {
@@ -176,7 +187,7 @@ export const Experience = () => {
             },
           }}
         >
-          <group position-x={1}>
+          <group position-x={isMobile ? -0.25 : 1}>
             <SectionTitle
               position-x={-0.5}
               position-z={0}
@@ -210,7 +221,8 @@ export const Experience = () => {
         </motion.group>
         {/* CONTACT */}
         <motion.group
-          position-z={3 * SECTIONS_DISTANCE}
+          position-x={isMobile ? 3 * SECTIONS_DISTANCE : 0}
+          position-z={isMobile ? -4 : 3 * SECTIONS_DISTANCE}
           position-y={-5}
           variants={{
             contact: {
@@ -218,10 +230,13 @@ export const Experience = () => {
             },
           }}
         >
-          <SectionTitle position-x={-2} position-z={0.6}>
+          <SectionTitle
+            position-x={isMobile ? -1.1 : -2 * scaleFactor}
+            position-z={0.6}
+          >
             CONTACT
           </SectionTitle>
-          <group position-x={-2}>
+          <group position-x={-2 * scaleFactor}>
             <ParkBench
               scale={0.5}
               position-x={-0.5}
@@ -254,8 +269,8 @@ export const Experience = () => {
           />
           <Float floatIntensity={1.5} speed={3}>
             <Pigeon
-              position-x={2}
-              position-y={1.5}
+              position-x={isMobile ? 0 : 2 * scaleFactor}
+              position-y={isMobile ? 2.2 : 1.5}
               position-z={-0.5}
               scale={0.3}
             />
